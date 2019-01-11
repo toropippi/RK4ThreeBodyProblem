@@ -8,13 +8,15 @@ public class RK4 : MonoBehaviour
     public Texture2D tex;
     Sprite sprite;
     int cnt;
-    int WX = 640;
-    int WY = 480;
+    int WX = 640*2;
+    int WY = 480*2;
 
-    double speed = 256.0;
+    double speed = 1024.0;//1024でok
+    double rspeed;
     double Tlimit = 0.0000000001;
-    double h = 0.001;
+    double h;
     double t = 0.0;
+    double lastt=0.0;
     double x1 = 3.0-1.5;
     double y1 = 4.0-1.5;
     double u1 = 0.0;
@@ -82,6 +84,8 @@ public class RK4 : MonoBehaviour
     double l4;
     double n4;
     double[] retout;
+
+    int loopcount;
     //Random.Range(0, 60) + Const.CO.WX;
     void Start()
     {
@@ -105,26 +109,10 @@ public class RK4 : MonoBehaviour
         GetComponent<SpriteRenderer>().sprite = sprite;
 
 
-        speed = 256.0;
-        Tlimit = 0.0000000001;
-        h = 0.001;
-        t = 0.0;
-        x1 = 3.0 - 1.5;
-        y1 = 4.0 - 1.5;
-        u1 = 0.0;
-        v1 = 0.0;
-        x2 = 0.0 - 1.5;
-        y2 = 0.0 - 1.5;
-        u2 = 0.0;
-        v2 = 0.0;
-        x3 = 3.0 - 1.5;
-        y3 = 0.0 - 1.5;
-        u3 = 0.0;
-        v3 = 0.0;
-        m1 = 3.0;
-        m2 = 4.0;
-        m3 = 5.0;
+        rspeed=1.0/ speed;
+        h =  0.1 / speed;
         retout = new double[6];
+        loopcount= 0;
     }
 
     // Update is called once per frame
@@ -139,8 +127,9 @@ public class RK4 : MonoBehaviour
     //るんげくったによる数値亢進
     void RKrutin()
     {
-        for (int j = 0; j < 64;j++) {
-            for (int i = 0; i < 256; i++)
+        double startt = t;
+        for (int j = 0; j < 2048;j++) {
+            for (int i = 0; i < 32; i++)
             {
                 fxy(x1, y1, x2, y2, x3, y3, m1, m2, m3, retout);
                 a1 = h * u1;
@@ -198,22 +187,23 @@ public class RK4 : MonoBehaviour
                 l4 = h * retout[4];
                 n4 = h * retout[5];
 
-                x1 += h * (a1 + 2.0 * a2 + 2.0 * a3 + a4) / 6.0;
-                y1 += h * (b1 + 2.0 * b2 + 2.0 * b3 + b4) / 6.0;
-                u1 += h * (c1 + 2.0 * c2 + 2.0 * c3 + c4) / 6.0;
-                v1 += h * (d1 + 2.0 * d2 + 2.0 * d3 + d4) / 6.0;
-                x2 += h * (e1 + 2.0 * e2 + 2.0 * e3 + e4) / 6.0;
-                y2 += h * (f1 + 2.0 * f2 + 2.0 * f3 + f4) / 6.0;
-                u2 += h * (g1 + 2.0 * g2 + 2.0 * g3 + g4) / 6.0;
-                v2 += h * (h1 + 2.0 * h2 + 2.0 * h3 + h4) / 6.0;
-                x3 += h * (j1 + 2.0 * j2 + 2.0 * j3 + j4) / 6.0;
-                y3 += h * (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0;
-                u3 += h * (l1 + 2.0 * l2 + 2.0 * l3 + l4) / 6.0;
-                v3 += h * (n1 + 2.0 * n2 + 2.0 * n3 + n4) / 6.0;
-                t += h;
+                x1 += (a1 + 2.0 * a2 + 2.0 * a3 + a4) * 0.166666666666666666666666666666666666666666666666666667;
+                y1 += (b1 + 2.0 * b2 + 2.0 * b3 + b4) * 0.166666666666666666666666666666666666666666666666666667;
+                u1 += (c1 + 2.0 * c2 + 2.0 * c3 + c4) * 0.166666666666666666666666666666666666666666666666666667;
+                v1 += (d1 + 2.0 * d2 + 2.0 * d3 + d4) * 0.166666666666666666666666666666666666666666666666666667;
+                x2 += (e1 + 2.0 * e2 + 2.0 * e3 + e4) * 0.166666666666666666666666666666666666666666666666666667;
+                y2 += (f1 + 2.0 * f2 + 2.0 * f3 + f4) * 0.166666666666666666666666666666666666666666666666666667;
+                u2 += (g1 + 2.0 * g2 + 2.0 * g3 + g4) * 0.166666666666666666666666666666666666666666666666666667;
+                v2 += (h1 + 2.0 * h2 + 2.0 * h3 + h4) * 0.166666666666666666666666666666666666666666666666666667;
+                x3 += (j1 + 2.0 * j2 + 2.0 * j3 + j4) * 0.166666666666666666666666666666666666666666666666666667;
+                y3 += (k1 + 2.0 * k2 + 2.0 * k3 + k4) * 0.166666666666666666666666666666666666666666666666666667;
+                u3 += (l1 + 2.0 * l2 + 2.0 * l3 + l4) * 0.166666666666666666666666666666666666666666666666666667;
+                v3 += (n1 + 2.0 * n2 + 2.0 * n3 + n4) * 0.166666666666666666666666666666666666666666666666666667;
+                
 
 
-                if (i % 16 == 0) {
+                if (i % 2 == 0) {
+                    t += h*2;
                     double r12 = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
                     double r13 = (x1 - x3) * (x1 - x3) + (y1 - y3) * (y1 - y3);
                     double r23 = (x2 - x3) * (x2 - x3) + (y2 - y3) * (y2 - y3);
@@ -222,18 +212,50 @@ public class RK4 : MonoBehaviour
                     if (r13 < minw) minw = r13;
                     if (r23 < minw) minw = r23;
                     double minf = Math.Sqrt(minw);
-                    h = minf / speed;
-                    if (minf < 0.1) h = minw / speed / 2.0;
-                    if (minf < 0.01) h = minw / speed / 8.0;
-                    if (h < Tlimit) h = Tlimit;
-                }
-            }
 
-            Pset(x1 * 70.0 + 320.0, y1 * 70.0 + 240.0, 90, 255, 90);
-            Pset(x2 * 70.0 + 320.0, y2 * 70.0 + 240.0, 255, 90, 90);
-            Pset(x3 * 70.0 + 320.0, y3 * 70.0 + 240.0, 255, 255, 255);
-            //ループ終わり
-        }
+                    if (minf < 0.1)
+                    {
+                        if (minf < 0.032)
+                        {
+                            if (minf < 0.01)
+                            {
+                                if (minf < 0.001)
+                                {
+                                    h = minw * rspeed * 0.3;
+                                    if (h < Tlimit) h = Tlimit;
+                                }
+                                else
+                                {
+                                    h = minw * rspeed * 0.45;
+                                }
+                            }
+                            else
+                            {
+                                h = minw * rspeed * 0.6;
+                            }
+                        }
+                        else
+                        {
+                            h = minw * rspeed * 0.8;
+                        }
+                    }
+                    else
+                    {
+                        h = minf * rspeed;
+                    }
+
+                    if (t - lastt > 0.001)
+                    {
+                        lastt = t;
+                        Pset(x1 * 70.0 + 320.0, y1 * 70.0 + 240.0, 90, 255, 90);
+                        Pset(x2 * 70.0 + 320.0, y2 * 70.0 + 240.0, 255, 90, 90);
+                        Pset(x3 * 70.0 + 320.0, y3 * 70.0 + 240.0, 255, 255, 255);
+                    }
+                }
+            }//ループ終わり
+            loopcount += 32;
+            if (t - startt > 0.08) break;//一定時間すぎていれば
+        }//ループ終わり
 
 
 
@@ -243,9 +265,9 @@ public class RK4 : MonoBehaviour
         //if cnt\4096 == 0{
         //color 90,255,90
         tex.Apply();
-        if (cnt % 16 == 0)
+        if (cnt % 8 == 0)
         {
-            Debug.Log("cnt=" + cnt + "/  h*100000=" + h * 100000.0 + " t=" + t + "  u1v1="+u1+"  "+v1+"  y1="+y1+"");
+            Debug.Log("loopcount=" + loopcount + "  t=" + t + "");
         }
 
     }
@@ -255,8 +277,8 @@ public class RK4 : MonoBehaviour
     //HSPのPSET
     void Pset(double x, double y,int r,int g,int b)
     {
-        int ix = Mathf.Clamp((int)x, 0, WX - 1);
-        int iy = Mathf.Clamp((int)y, 0, WY - 1);
+        int ix = Mathf.Clamp((int)(x * 2.0), 0, WX - 1);
+        int iy = Mathf.Clamp((int)(y * 2.0), 0, WY - 1);
         tex.SetPixel(ix, iy, new Color(1.0f*r/255.0f, 1.0f * g / 255.0f, 1.0f * b / 255.0f, 1.0f));
     }
 
