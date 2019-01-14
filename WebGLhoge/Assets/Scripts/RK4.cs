@@ -11,11 +11,11 @@ public class RK4 : MonoBehaviour
     int WX = 640*2;
     int WY = 480*2;
 
-    double speed = 1024.0;//1024でok
+    public double speed = 1024.0;//初期値1024でok
     double rspeed;
     double Tlimit = 0.0000000001;
-    double h;
-    double t = 0.0;
+    public double h;
+    public double t = 0.0;
     double lastt=0.0;
     double x1 = 3.0-1.5;
     double y1 = 4.0-1.5;
@@ -84,13 +84,32 @@ public class RK4 : MonoBehaviour
     double l4;
     double n4;
     double[] retout;
+    
+    public int loopcount;
 
-    int loopcount;
+    public int stopflg = 0;//普通は0、stopの時は1
     //Random.Range(0, 60) + Const.CO.WX;
+
+
     void Start()
     {
-        tex = new Texture2D(WX,WY, TextureFormat.RGBA32, false);
         //Texture2DからSpriteを作成
+        tex = new Texture2D(WX,WY, TextureFormat.RGBA32, false);
+        
+        sprite = Sprite.Create(
+          texture: tex,
+          rect: new Rect(0, 0, WX, WY),
+          pivot: new Vector2(0.5f, 0.5f)
+        );
+        GetComponent<SpriteRenderer>().sprite = sprite;
+        retout = new double[6];
+
+        MyReset();
+    }
+
+    //初期値にリセット
+    public void MyReset()
+    {
         for (int j = 0; j < WY; j++)
         {
             for (int i = 0; i < WX; i++)
@@ -100,31 +119,48 @@ public class RK4 : MonoBehaviour
         }
         tex.Apply();
 
+        Tlimit = 0.0000000001;
+        t = 0.0;
+        lastt = 0.0;
+        m1 = 3.0;
+        m2 = 4.0;
+        m3 = 5.0;
+        x1 = m1;
+        y1 = m2;
+        u1 = 0.0;
+        v1 = 0.0;
+        x2 = 0.0;
+        y2 = 0.0;
+        u2 = 0.0;
+        v2 = 0.0;
+        x3 = m1;
+        y3 = 0.0;
+        u3 = 0.0;
+        v3 = 0.0;
+        double meanx = (x1 + x2 + x3) / 3.0;
+        double meany = (y1 + y2 + y3) / 3.0;
+        x1 -= meanx;
+        x2 -= meanx;
+        x3 -= meanx;
+        y1 -= meany;
+        y2 -= meany;
+        y3 -= meany;
 
-        sprite = Sprite.Create(
-          texture: tex,
-          rect: new Rect(0, 0, WX, WY),
-          pivot: new Vector2(0.5f, 0.5f)
-        );
-        GetComponent<SpriteRenderer>().sprite = sprite;
-
-
-        rspeed=1.0/ speed;
-        h =  0.1 / speed;
-        retout = new double[6];
-        loopcount= 0;
+        rspeed = 1.0 / speed;
+        h = 0.1 / speed;
+        loopcount = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        RKrutin();
-        //transform.position = transform.position - new Vector3(0.55f, 0.0f, 0.0f);
+        if (stopflg==0)
+            RKrutin();
         cnt++;
     }
 
 
-    //るんげくったによる数値亢進
+    //普通のdouble精度によるルンゲクッタによる数値亢進
     void RKrutin()
     {
         double startt = t;
@@ -265,21 +301,23 @@ public class RK4 : MonoBehaviour
         //if cnt\4096 == 0{
         //color 90,255,90
         tex.Apply();
-        if (cnt % 8 == 0)
-        {
-            Debug.Log("loopcount=" + loopcount + "  t=" + t + "");
-        }
 
     }
 
 
 
-    //HSPのPSET
+
+
+
+    //HSPのpset命令みたいなもん
     void Pset(double x, double y,int r,int g,int b)
     {
-        int ix = Mathf.Clamp((int)(x * 2.0), 0, WX - 1);
-        int iy = Mathf.Clamp((int)(y * 2.0), 0, WY - 1);
-        tex.SetPixel(ix, iy, new Color(1.0f*r/255.0f, 1.0f * g / 255.0f, 1.0f * b / 255.0f, 1.0f));
+        int ix = (int)(x * 2.0);
+        int iy = (int)(y * 2.0);
+        if (ix>=0 && ix<WX && iy>=0 && iy < WY)
+        {
+            tex.SetPixel(ix, iy, new Color(1.0f * r / 255.0f, 1.0f * g / 255.0f, 1.0f * b / 255.0f, 1.0f));
+        }
     }
 
     //
@@ -307,9 +345,6 @@ public class RK4 : MonoBehaviour
         outd[5] = y13 * m1 + y23 * m2;//fy(x3,y3,x1,y1,x2,y2,m3,m1,m2);のとき
     }
 }
-
-
-
 
 
 
