@@ -42,7 +42,7 @@ public class RK4dd : MonoBehaviour
 
     public double speed = 1024.0;//初期値1024でok
     double rspeed;
-    double Tlimit = 0.0000000001;
+    double Tlimit = 0.0000000001;//
     public double h;
     public double t = 0.0;
     double lastt = 0.0;
