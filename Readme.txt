@@ -1,1 +1,2 @@
-�z�[���y�[�W��webGL��unity��?
+﻿FC2ホームページにWebGLを置きたかったけど1MB制限でできず。
+Unityで生成

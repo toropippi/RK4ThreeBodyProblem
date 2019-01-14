@@ -154,9 +154,9 @@ public class RK4dd : MonoBehaviour
         Tlimit = 0.000000000001;
         t = 0.0;
         lastt = 0.0;
-        n_m1 = 12.0;
-        n_m2 = 35.0;
-        n_m3 = 37.0;
+        n_m1 = 3.0;
+        n_m2 = 4.0;
+        n_m3 = 5.0;
         x1 = new dd(n_m1, 0.0);
         y1 = new dd(n_m2, 0.0);
         u1 = new dd(0.0, 0.0);
