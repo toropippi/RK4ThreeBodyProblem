@@ -9,6 +9,7 @@ public class button2sc : MonoBehaviour
     public void ButtonPush()
     {
         Debug.Log("ストップ");
-        GameObject.Find("sprite0").GetComponent<RK4dd>().stopflg=1;
+        GameObject.Find("sprite0").GetComponent<RK4>().stopflg = 1;
+        GameObject.Find("sprite0").GetComponent<RK4dd>().stopflg = 1;
     }
 }

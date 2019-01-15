@@ -11,27 +11,31 @@ public class RK4 : MonoBehaviour
     int WX = 640*2;
     int WY = 480*2;
 
-    public double speed = 1024.0;//初期値1024でok
-    double rspeed;
-    double Tlimit = 0.0000000001;
+    public double speed = 1024.0;//距離1のとき時間刻み h=1/1024 になる
+    public double rspeed;
+    double Tlimit = 0.0000000001;//10^-10。最悪h時間(speed1024のとき)
     public double h;
     public double t = 0.0;
     double lastt=0.0;
-    double x1 = 3.0-1.5;
-    double y1 = 4.0-1.5;
-    double u1 = 0.0;
-    double v1 = 0.0;
-    double x2 = 0.0-1.5;
-    double y2 = 0.0-1.5;
-    double u2 = 0.0;
-    double v2 = 0.0;
-    double x3 = 3.0-1.5;
-    double y3 = 0.0-1.5;
-    double u3 = 0.0;
-    double v3 = 0.0;
-    double m1 = 3.0;
-    double m2 = 4.0;
-    double m3 = 5.0;
+    double scale;
+
+    double x1;
+    double y1;
+    double u1;
+    double v1;
+    double x2;
+    double y2;
+    double u2;
+    double v2;
+    double x3;
+    double y3;
+    double u3;
+    double v3;
+
+    public double m1;
+    public double m2;
+    public double m3;
+
     double a1;
     double b1;
     double c1;
@@ -86,13 +90,16 @@ public class RK4 : MonoBehaviour
     double[] retout;
     
     public int loopcount;
-
     public int stopflg = 0;//普通は0、stopの時は1
-    //Random.Range(0, 60) + Const.CO.WX;
+    public int mode;//double精度が選択されているときは1。デフォルトでは1
 
+    Pset pset;
 
     void Start()
     {
+        mode = 1;
+        pset =GameObject.Find("sprite0").GetComponent<Pset>();//コンポーネント取得
+
         //Texture2DからSpriteを作成
         tex = new Texture2D(WX,WY, TextureFormat.RGBA32, false);
         
@@ -101,15 +108,20 @@ public class RK4 : MonoBehaviour
           rect: new Rect(0, 0, WX, WY),
           pivot: new Vector2(0.5f, 0.5f)
         );
-        GetComponent<SpriteRenderer>().sprite = sprite;
-        retout = new double[6];
 
+        //その他変数
+        retout = new double[6];
+        m1 = 3.0;
+        m2 = 4.0;
+        m3 = 5.0;
         MyReset();
     }
 
     //初期値にリセット
     public void MyReset()
     {
+        if (mode==1)
+            GetComponent<SpriteRenderer>().sprite = sprite;
         for (int j = 0; j < WY; j++)
         {
             for (int i = 0; i < WX; i++)
@@ -118,13 +130,12 @@ public class RK4 : MonoBehaviour
             }
         }
         tex.Apply();
-
-        Tlimit = 0.0000000001;
+        
         t = 0.0;
         lastt = 0.0;
-        m1 = 3.0;
-        m2 = 4.0;
-        m3 = 5.0;
+        //m1 = 3.0;
+        //m2 = 4.0;
+        //m3 = 5.0;
         x1 = m1;
         y1 = m2;
         u1 = 0.0;
@@ -145,22 +156,32 @@ public class RK4 : MonoBehaviour
         y1 -= meany;
         y2 -= meany;
         y3 -= meany;
+        scale = 140.0 / (meanx + meany);
 
+        Tlimit = 0.0000000001 / speed * 1000;//speed1024のとき最悪h時間10^-10
         rspeed = 1.0 / speed;
         h = 0.1 / speed;
         loopcount = 0;
     }
 
+
+
+
+
+
+
+
+
     // Update is called once per frame
     void Update()
     {
-        if (stopflg==0)
+        if ((stopflg==0)&(mode==1))
             RKrutin();
         cnt++;
     }
 
 
-    //普通のdouble精度によるルンゲクッタによる数値亢進
+    //double精度によるルンゲクッタによる数値亢進
     void RKrutin()
     {
         double startt = t;
@@ -257,35 +278,35 @@ public class RK4 : MonoBehaviour
                             {
                                 if (minf < 0.001)
                                 {
-                                    h = minw * rspeed * 0.3;
+                                    h = minw * rspeed * 0.3;//距離が0.001以下の時
                                     if (h < Tlimit) h = Tlimit;
                                 }
                                 else
                                 {
-                                    h = minw * rspeed * 0.45;
+                                    h = minw * rspeed * 0.45;//距離が0.01以下の時
                                 }
                             }
                             else
                             {
-                                h = minw * rspeed * 0.6;
+                                h = minw * rspeed * 0.6;//距離が0.032以下の時
                             }
                         }
                         else
                         {
-                            h = minw * rspeed * 0.8;
+                            h = minw * rspeed * 0.8;//距離が0.1以下の時
                         }
                     }
                     else
                     {
-                        h = minf * rspeed;
+                        h = minf * rspeed;//距離が0.1以上の時
                     }
 
-                    if (t - lastt > 0.001)
+                    if (t - lastt > 0.001)//毎ループ描画するわけにもいかないので
                     {
                         lastt = t;
-                        Pset(x1 * 70.0 + 320.0, y1 * 70.0 + 240.0, 90, 255, 90);
-                        Pset(x2 * 70.0 + 320.0, y2 * 70.0 + 240.0, 255, 90, 90);
-                        Pset(x3 * 70.0 + 320.0, y3 * 70.0 + 240.0, 255, 255, 255);
+                        pset.PsetTex2D(tex, x1 * scale + 320.0, y1 * scale + 240.0, 90, 255, 90);
+                        pset.PsetTex2D(tex, x2 * scale + 320.0, y2 * scale + 240.0, 255, 90, 90);
+                        pset.PsetTex2D(tex, x3 * scale + 320.0, y3 * scale + 240.0, 255, 255, 255);
                     }
                 }
             }//ループ終わり
@@ -294,31 +315,13 @@ public class RK4 : MonoBehaviour
         }//ループ終わり
 
 
-
-
-        //if cnt\1024 == 0:await 0
-        //ここでpset
-        //if cnt\4096 == 0{
-        //color 90,255,90
         tex.Apply();
-
     }
 
 
 
 
 
-
-    //HSPのpset命令みたいなもん
-    void Pset(double x, double y,int r,int g,int b)
-    {
-        int ix = (int)(x * 2.0);
-        int iy = (int)(y * 2.0);
-        if (ix>=0 && ix<WX && iy>=0 && iy < WY)
-        {
-            tex.SetPixel(ix, iy, new Color(1.0f * r / 255.0f, 1.0f * g / 255.0f, 1.0f * b / 255.0f, 1.0f));
-        }
-    }
 
     //
     void fxy(double x1, double y1, double x2, double y2, double x3, double y3, double m1, double m2, double m3, double[] outd)

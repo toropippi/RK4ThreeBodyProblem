@@ -10,5 +10,6 @@ public class button1sc : MonoBehaviour
     {
         Debug.Log("再生");
         GameObject.Find("sprite0").GetComponent<RK4dd>().stopflg = 0;
+        GameObject.Find("sprite0").GetComponent<RK4>().stopflg = 0;
     }
 }

@@ -9,6 +9,7 @@ public class button3sc : MonoBehaviour
     public void ButtonPush()
     {
         Debug.Log("リセット");
+        GameObject.Find("sprite0").GetComponent<RK4>().MyReset();
         GameObject.Find("sprite0").GetComponent<RK4dd>().MyReset();
     }
 }
