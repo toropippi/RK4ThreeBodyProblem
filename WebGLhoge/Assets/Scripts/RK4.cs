@@ -156,7 +156,7 @@ public class RK4 : MonoBehaviour
         y1 -= meany;
         y2 -= meany;
         y3 -= meany;
-        scale = 140.0 / (meanx + meany);
+        scale = 190.0 / (meanx + meany);
 
         Tlimit = 0.0000000001 / speed * 1000;//speed1024のとき最悪h時間10^-10
         rspeed = 1.0 / speed;
