@@ -6,6 +6,9 @@
 ・精度は倍精度と疑似４倍精度を選べる
 ・ピタゴラス数?は32種類選べる
 
+実行サイトはこちら
+https://toropippi.github.io/RK4ThreeBodyProblem/
+
 なぜ作った？
 https://qiita.com/advent-calendar/2018/numerical_analysis
 この数値計算 Advent Calendar 2018を見てルンゲクッタ法に興味がわき作った。
